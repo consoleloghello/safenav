@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="题库导航：化工和危险化学品重大生产安全事故隐患判定、应急处置等题库在线复习">
+<title>题库导航</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <span style="flex:1 1 auto; font-size:14px; color:var(--text-dim)">
+      <b style="color:var(--text)">题库导航</b>
+    </span>
+    <button class="theme-btn" id="theme" type="button" title="切换深色 / 浅色">🌙</button>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>题库导航</h1>
+  <p>点击下方卡片进入对应题库。支持关键词搜索、深色模式、手机浏览与打印。</p>
+  <div class="meta" id="meta"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer id="foot"></footer>
+
+<script src="data/manifest.js"></script>
+<script>
+(function () {
+  "use strict";
+  const LS_THEME = "qb.theme";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+  const KEY = (i) => String.fromCharCode(65 + i);
+
+  /* 主题 */
+  function setTheme(t, save) {
+    document.documentElement.dataset.theme = t;
+    $("theme").textContent = t === "dark" ? "🌙" : "☀️";
+    if (save) { try { localStorage.setItem(LS_THEME, t); } catch (e) {} }
+  }
+  (function () {
+    let t = null;
+    try { t = localStorage.getItem(LS_THEME); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = "dark";
+    setTheme(t, false);
+  })();
+  $("theme").onclick = () =>
+    setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+
+  /* 渲染题库卡片 */
+  const PAPERS = window.PAPERS || [];
+  const nf = (n) => (n || 0);
+  const fmtDate = (s) => (s && /^\d{8}$/.test(s))
+    ? s.slice(0, 4) + "-" + s.slice(4, 6) + "-" + s.slice(6, 8) : "";
+
+  $("grid").innerHTML = PAPERS.map((p) => {
+    const chips = [`<span class="chip">共 <b>${nf(p.total)}</b> 题</span>`];
+    [["1", "单"], ["2", "多"], ["3", "判"]].forEach(([t, label]) => {
+      const n = (p.byType && p.byType[t]) || 0;
+      if (n) chips.push(`<span class="chip">${label}选 <b>${n}</b></span>`);
+    });
+    if (p.judge) chips.splice(1, 0, "");
+    const date = fmtDate(p.batch);
+    return `<section class="paper">
+      <h3>${esc(p.title)}</h3>
+      ${p.sub ? `<p class="desc">${esc(p.sub)}</p>` : ""}
+      <div class="tags">${chips.filter(Boolean).join("")}${date ? `<span class="chip">批次 <b>${date}</b></span>` : ""}</div>
+      <a class="go" href="viewer.html?p=${encodeURIComponent(p.id)}">进入浏览 →</a>
+    </section>`;
+  }).join("") || `<div class="empty"><span>📚</span>还没有题库，请先在 data/manifest.js 中添加。</div>`;
+
+  const totalQ = PAPERS.reduce((s, p) => s + nf(p.total), 0);
+  $("meta").innerHTML =
+    `<span class="chip">共 <b>${PAPERS.length}</b> 套题库</span>` +
+    `<span class="chip">合计 <b>${totalQ}</b> 道题</span>`;
+
+  $("foot").innerHTML =
+    `新增题库：放入 <code>data/&lt;id&gt;.js</code>，再在 <code>data/manifest.js</code> 里加一行即可。`;
+})();
+</script>
+</body>
+</html>
