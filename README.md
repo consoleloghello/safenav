@@ -100,13 +100,20 @@ https://<你的用户名>.github.io/<仓库名>/
 
 ## 本地预览
 
-```bash
-# 方式一：直接双击 index.html（无需服务器）
-open index.html
+**方式一：起本地服务器（推荐，和线上环境一致）**
 
-# 方式二：起本地服务器（和线上环境一致，推荐验证时用）
-deno task serve
+```bash
+cd question-bank
+deno task serve          # 默认 http://localhost:8000
+PORT=8080 deno task serve  # 换端口
 ```
+
+然后浏览器打开 **http://localhost:8000/** 即可。按 `Ctrl+C` 停止。
+
+**方式二：直接双击 `index.html`**
+
+不需要任何服务器，`file://` 直接打开就能用（数据用 `<script src>` 加载，不受 CORS 限制）。
+缺点是路径里带 `?p=` 的查看器页面在部分浏览器里体验略有差异，正式验证建议用方式一。
 
 ## 部署到 GitHub Pages
 
