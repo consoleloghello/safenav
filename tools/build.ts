@@ -64,7 +64,9 @@ function validate(file: string, qs: Question[]) {
     if (!["1", "2", "3"].includes(q.type)) bad.push(`${at}：未知题型 "${q.type}"`);
     if (!q.opts.length) bad.push(`${at}：没有选项`);
     if (!q.ans) bad.push(`${at}：没有答案`);
-    if (q.type === "3" && q.opts.length !== 2) bad.push(`${at}：判断题应有 2 个选项，实际 ${q.opts.length}`);
+    if (q.type === "3" && q.opts.length !== 2) {
+      bad.push(`${at}：判断题应有 2 个选项，实际 ${q.opts.length}`);
+    }
     if (q.type === "1" && q.ans.replace(/[^A-Za-z]/g, "").length !== 1) {
       bad.push(`${at}：单选题答案应为单个字母，实际 "${q.ans}"`);
     }
@@ -95,7 +97,12 @@ function pickBatch(raw: RawQuestion[]): string | undefined {
     if (b) count.set(b, (count.get(b) ?? 0) + 1);
   }
   let best: string | undefined, max = 0;
-  for (const [b, n] of count) if (n > max) { best = b; max = n; }
+  for (const [b, n] of count) {
+    if (n > max) {
+      best = b;
+      max = n;
+    }
+  }
   return best;
 }
 
@@ -110,10 +117,10 @@ function stripOrderPrefix(base: string): string {
   const m = base.match(/^(\d+(?:[-_]\d+)*)([-_·、.\s]*)([\s\S]*)$/);
   if (!m) return base;
   const [, nums, , rest] = m;
-  if (!rest) return base;                          // 全是编号，保留原样
+  if (!rest) return base; // 全是编号，保留原样
   const looksLikeNumbering = /[-_]/.test(nums) || nums.length <= 3;
-  if (!looksLikeNumbering) return base;            // “2024年真题”这类不吃掉
-  if (/^\d/.test(rest)) return base;               // 编号没切干净，保守不动
+  if (!looksLikeNumbering) return base; // “2024年真题”这类不吃掉
+  if (/^\d/.test(rest)) return base; // 编号没切干净，保守不动
   return rest;
 }
 
@@ -123,7 +130,7 @@ async function main() {
   for await (const e of Deno.readDir(SRC_DIR)) {
     if (e.isFile && /\.json$/i.test(e.name)) files.push(e.name);
   }
-  files.sort((a, b) => a.localeCompare(b, "zh"));   // 中文按拼音排序，可加数字前缀控制顺序
+  files.sort((a, b) => a.localeCompare(b, "zh")); // 中文按拼音排序，可加数字前缀控制顺序
 
   if (!files.length) {
     console.error(`❌ ${SRC_DIR}/ 里没有找到任何 .json 文件`);
@@ -161,10 +168,12 @@ async function main() {
 
     const raw = json.data as RawQuestion[];
     const questions = convert(raw);
-    validate(file, questions);          // 校验不通过会直接退出，不会写任何文件
+    validate(file, questions); // 校验不通过会直接退出，不会写任何文件
 
     const byType: Record<string, number> = { "1": 0, "2": 0, "3": 0 };
-    questions.forEach((q) => { byType[q.type] = (byType[q.type] ?? 0) + 1; });
+    questions.forEach((q) => {
+      byType[q.type] = (byType[q.type] ?? 0) + 1;
+    });
 
     built.push({
       id,

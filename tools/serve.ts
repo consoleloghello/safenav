@@ -9,7 +9,7 @@
  */
 
 const PORT = Number(Deno.env.get("PORT") ?? 8000);
-const ROOT = new URL("../", import.meta.url);   // 项目根目录
+const ROOT = new URL("../", import.meta.url); // 项目根目录
 
 const MIME: Record<string, string> = {
   html: "text/html; charset=utf-8",
@@ -41,12 +41,15 @@ function safePath(urlPath: string): string | null {
   return parts.join("/");
 }
 
-Deno.serve({ port: PORT, onListen: ({ port }) => {
-  console.log(`\n  题库站点已启动\n`);
-  console.log(`  导航页    http://localhost:${port}/`);
-  console.log(`  查看器    http://localhost:${port}/viewer.html?p=<题库名>\n`);
-  console.log(`  按 Ctrl+C 停止\n`);
-} }, async (req) => {
+Deno.serve({
+  port: PORT,
+  onListen: ({ port }) => {
+    console.log(`\n  题库站点已启动\n`);
+    console.log(`  导航页    http://localhost:${port}/`);
+    console.log(`  查看器    http://localhost:${port}/viewer.html?p=<题库名>\n`);
+    console.log(`  按 Ctrl+C 停止\n`);
+  },
+}, async (req) => {
   const rel = safePath(new URL(req.url).pathname);
   if (rel === null) {
     return new Response("403 Forbidden", { status: 403 });
@@ -67,7 +70,7 @@ Deno.serve({ port: PORT, onListen: ({ port }) => {
     return new Response(data, {
       headers: {
         "content-type": MIME[ext] ?? "application/octet-stream",
-        "cache-control": "no-cache",   // 改完文件刷新即可生效
+        "cache-control": "no-cache", // 改完文件刷新即可生效
       },
     });
   } catch {

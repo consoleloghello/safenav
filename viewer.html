@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="dark">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>题库 · 加载中…</title>
-<link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>安环培训 · 加载中…</title>
+    <link rel="stylesheet" href="assets/style.css">
+  </head>
+  <body>
+    <header>
+      <div class="bar" id="bar">
+        <a class="back" href="index.html">‹ 安环培训</a>
+        <label class="searchwrap">
+          <span class="ico">🔍</span>
+          <input id="search" type="search" placeholder="搜索题干 / 选项 / 解析…" autocomplete="off"
+            enterkeyhint="search">
+          <button class="clear" id="clear" type="button" title="清空">✕</button>
+        </label>
+        <button class="theme-btn" id="theme" type="button" title="切换深色 / 浅色">🌙</button>
+      </div>
+      <div class="titlebar">
+        <h1 class="brand"><span id="ptitle">加载中…</span><small id="sub"></small></h1>
+        <div class="stats" id="stats"></div>
+      </div>
+    </header>
 
-<header>
-  <div class="bar" id="bar">
-    <a class="back" href="index.html">‹ 题库</a>
-    <label class="searchwrap">
-      <span class="ico">🔍</span>
-      <input id="search" type="search" placeholder="搜索题干 / 选项 / 解析…" autocomplete="off" enterkeyhint="search">
-      <button class="clear" id="clear" type="button" title="清空">✕</button>
-    </label>
-    <button class="theme-btn" id="theme" type="button" title="切换深色 / 浅色">🌙</button>
-  </div>
-  <div class="titlebar">
-    <h1 class="brand"><span id="ptitle">加载中…</span><small id="sub"></small></h1>
-    <div class="stats" id="stats"></div>
-  </div>
-</header>
+    <main id="list"></main>
 
-<main id="list"></main>
+    <button class="totop" id="totop" type="button" title="回到顶部">↑</button>
 
-<button class="totop" id="totop" type="button" title="回到顶部">↑</button>
-
-<script src="assets/viewer.js"></script>
-</body>
+    <script src="assets/viewer.js"></script>
+  </body>
 </html>

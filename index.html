@@ -44,91 +44,88 @@
 
     <script src="data/manifest.js"></script>
     <script>
-      (function () {
-        "use strict";
-        const LS_THEME = "qb.theme";
-        const $ = (id) => document.getElementById(id);
-        const esc = (s) =>
-          String(s == null ? "" : s).replace(
-            /[&<>"']/g,
-            (c) =>
-              ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;",
-              })[c],
-          );
-        const KEY = (i) => String.fromCharCode(65 + i);
+    (function () {
+      "use strict";
+      const LS_THEME = "qb.theme";
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) =>
+        String(s == null ? "" : s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const KEY = (i) => String.fromCharCode(65 + i);
 
-        /* 主题 */
-        function setTheme(t, save) {
-          document.documentElement.dataset.theme = t;
-          $("theme").textContent = t === "dark" ? "🌙" : "☀️";
-          if (save) {
-            try {
-              localStorage.setItem(LS_THEME, t);
-            } catch (e) {}
-          }
-        }
-        (function () {
-          let t = null;
+      /* 主题 */
+      function setTheme(t, save) {
+        document.documentElement.dataset.theme = t;
+        $("theme").textContent = t === "dark" ? "🌙" : "☀️";
+        if (save) {
           try {
-            t = localStorage.getItem(LS_THEME);
+            localStorage.setItem(LS_THEME, t);
           } catch (e) {}
-          if (t !== "light" && t !== "dark") t = "dark";
-          setTheme(t, false);
-        })();
-        $("theme").onclick = () =>
-          setTheme(
-            document.documentElement.dataset.theme === "dark"
-              ? "light"
-              : "dark",
-            true,
-          );
+        }
+      }
+      (function () {
+        let t = null;
+        try {
+          t = localStorage.getItem(LS_THEME);
+        } catch (e) {}
+        if (t !== "light" && t !== "dark") t = "dark";
+        setTheme(t, false);
+      })();
+      $("theme").onclick = () =>
+        setTheme(
+          document.documentElement.dataset.theme === "dark" ? "light" : "dark",
+          true,
+        );
 
-        /* 渲染题库卡片 */
-        const PAPERS = window.PAPERS || [];
-        const nf = (n) => n || 0;
-        const fmtDate = (s) =>
-          s && /^\d{8}$/.test(s)
-            ? s.slice(0, 4) + "-" + s.slice(4, 6) + "-" + s.slice(6, 8)
-            : "";
+      /* 渲染题库卡片 */
+      const PAPERS = window.PAPERS || [];
+      const nf = (n) => n || 0;
+      const fmtDate = (s) =>
+        s && /^\d{8}$/.test(s) ? s.slice(0, 4) + "-" + s.slice(4, 6) + "-" + s.slice(6, 8) : "";
 
-        $("grid").innerHTML =
-          PAPERS.map((p) => {
-            const chips = [
-              `<span class="chip">共 <b>${nf(p.total)}</b> 题</span>`,
-            ];
-            [
-              ["1", "单"],
-              ["2", "多"],
-              ["3", "判"],
-            ].forEach(([t, label]) => {
-              const n = (p.byType && p.byType[t]) || 0;
-              if (n)
-                chips.push(`<span class="chip">${label}选 <b>${n}</b></span>`);
-            });
-            const date = fmtDate(p.batch);
-            return `<section class="paper">
+      $("grid").innerHTML = PAPERS.map((p) => {
+        const chips = [
+          `<span class="chip">共 <b>${nf(p.total)}</b> 题</span>`,
+        ];
+        [
+          ["1", "单"],
+          ["2", "多"],
+          ["3", "判"],
+        ].forEach(([t, label]) => {
+          const n = (p.byType && p.byType[t]) || 0;
+          if (n) {
+            chips.push(`<span class="chip">${label}选 <b>${n}</b></span>`);
+          }
+        });
+        const date = fmtDate(p.batch);
+        return `<section class="paper">
       <h3>${esc(p.title)}</h3>
       ${p.sub ? `<p class="desc">${esc(p.sub)}</p>` : ""}
-      <div class="tags">${chips.join("")}${date ? `<span class="chip">批次 <b>${date}</b></span>` : ""}</div>
+      <div class="tags">${chips.join("")}${
+          date ? `<span class="chip">批次 <b>${date}</b></span>` : ""
+        }</div>
       <a class="go" href="viewer.html?p=${encodeURIComponent(p.id)}">进入浏览 →</a>
     </section>`;
-          }).join("") ||
-          `<div class="empty"><span>📚</span>还没有题库，把导出的 json 放进 sources/ 后运行 deno task build 即可。</div>`;
+      }).join("") ||
+        `<div class="empty"><span>📚</span>还没有题库，把导出的 json 放进 sources/ 后运行 deno task build 即可。</div>`;
 
-        const totalQ = PAPERS.reduce((s, p) => s + nf(p.total), 0);
-        $("meta").innerHTML =
-          `<span class="chip">共 <b>${PAPERS.length}</b> 套题库</span>` +
-          `<span class="chip">合计 <b>${totalQ}</b> 道题</span>`;
+      const totalQ = PAPERS.reduce((s, p) => s + nf(p.total), 0);
+      $("meta").innerHTML = `<span class="chip">共 <b>${PAPERS.length}</b> 套题库</span>` +
+        `<span class="chip">合计 <b>${totalQ}</b> 道题</span>`;
 
-        $("foot").innerHTML =
-          // `新增题库：把导出的 json 丢进 <code>sources/</code>，运行 <code>deno task build</code> 即可（文件名就是按钮名）。`;
-          `本项目仅供参考`;
-      })();
+      $("foot").innerHTML =
+        // `新增题库：把导出的 json 丢进 <code>sources/</code>，运行 <code>deno task build</code> 即可（文件名就是按钮名）。`;
+        `本项目仅供参考`;
+    })();
     </script>
   </body>
 </html>

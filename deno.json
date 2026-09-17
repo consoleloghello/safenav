@@ -1,6 +1,12 @@
 {
+  "fmt": {
+    "exclude": ["data/", "sources/", "**/*.md"],
+    "lineWidth": 100
+  },
   "tasks": {
     "build": "deno run --allow-read=sources,data --allow-write=data tools/build.ts",
-    "serve": "deno run --allow-net --allow-read --allow-env=PORT tools/serve.ts"
+    "serve": "deno run --allow-net --allow-read --allow-env=PORT tools/serve.ts",
+    "fmt": "deno fmt",
+    "check": "deno fmt --check && deno check tools/build.ts tools/serve.ts"
   }
 }
