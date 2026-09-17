@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "build": "deno run --allow-read=sources --allow-write=data tools/build.ts",
+    "build": "deno run --allow-read=sources,data --allow-write=data tools/build.ts",
     "serve": "deno run --allow-net --allow-read jsr:@std/http/file-server ."
   }
 }

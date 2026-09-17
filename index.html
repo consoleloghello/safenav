@@ -66,15 +66,14 @@
       const n = (p.byType && p.byType[t]) || 0;
       if (n) chips.push(`<span class="chip">${label}选 <b>${n}</b></span>`);
     });
-    if (p.judge) chips.splice(1, 0, "");
     const date = fmtDate(p.batch);
     return `<section class="paper">
       <h3>${esc(p.title)}</h3>
       ${p.sub ? `<p class="desc">${esc(p.sub)}</p>` : ""}
-      <div class="tags">${chips.filter(Boolean).join("")}${date ? `<span class="chip">批次 <b>${date}</b></span>` : ""}</div>
+      <div class="tags">${chips.join("")}${date ? `<span class="chip">批次 <b>${date}</b></span>` : ""}</div>
       <a class="go" href="viewer.html?p=${encodeURIComponent(p.id)}">进入浏览 →</a>
     </section>`;
-  }).join("") || `<div class="empty"><span>📚</span>还没有题库，请先在 data/manifest.js 中添加。</div>`;
+  }).join("") || `<div class="empty"><span>📚</span>还没有题库，把导出的 json 放进 sources/ 后运行 deno task build 即可。</div>`;
 
   const totalQ = PAPERS.reduce((s, p) => s + nf(p.total), 0);
   $("meta").innerHTML =
@@ -82,7 +81,7 @@
     `<span class="chip">合计 <b>${totalQ}</b> 道题</span>`;
 
   $("foot").innerHTML =
-    `新增题库：放入 <code>data/&lt;id&gt;.js</code>，再在 <code>data/manifest.js</code> 里加一行即可。`;
+    `新增题库：把导出的 json 丢进 <code>sources/</code>，运行 <code>deno task build</code> 即可（文件名就是按钮名）。`;
 })();
 </script>
 </body>
