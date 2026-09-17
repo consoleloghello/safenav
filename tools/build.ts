@@ -99,6 +99,24 @@ function pickBatch(raw: RawQuestion[]): string | undefined {
   return best;
 }
 
+/**
+ * 去掉文件名开头的「排序编号」作为按钮显示名（文件名本身不变，仍作为 id）
+ *   01-2公司应急预案专项培训-线上考试  →  公司应急预案专项培训-线上考试
+ *   02-1化工和…判定准则-模拟考        →  化工和…判定准则-模拟考
+ *   隐患判定准则-全题库               →  不变（不以数字开头）
+ *   2024年真题                       →  不变（4 位纯数字，不像编号）
+ */
+function stripOrderPrefix(base: string): string {
+  const m = base.match(/^(\d+(?:[-_]\d+)*)([-_·、.\s]*)([\s\S]*)$/);
+  if (!m) return base;
+  const [, nums, , rest] = m;
+  if (!rest) return base;                          // 全是编号，保留原样
+  const looksLikeNumbering = /[-_]/.test(nums) || nums.length <= 3;
+  if (!looksLikeNumbering) return base;            // “2024年真题”这类不吃掉
+  if (/^\d/.test(rest)) return base;               // 编号没切干净，保守不动
+  return rest;
+}
+
 async function main() {
   // 1. 收集 sources/ 下的所有 json（文件名即题库 id）
   const files: string[] = [];
@@ -150,8 +168,8 @@ async function main() {
 
     built.push({
       id,
-      // 标题默认取文件名，可在 json 里加 "title"/"sub" 覆盖
-      title: String(json.title ?? "").trim() || id,
+      // 显示名：json 里的 "title" 优先，否则用文件名（自动去掉开头的排序编号）
+      title: String(json.title ?? "").trim() || stripOrderPrefix(id),
       sub: String(json.sub ?? json.desc ?? "").trim(),
       questions,
       byType,
